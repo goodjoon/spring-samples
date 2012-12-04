@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+    <!-- Target Bean 생성 설정 -->
+    <bean id="targetBean" class="chapt03.sample1.MessageBeanImpl">
+        <property name="name">
+            <value>쓰프링~</value>
+        </property>
+    </bean>
+
+    <!-- Advice Bean 선언 -->
+    <bean id="loggingAdvice" class="chapt03.sample1.LoggingAdvice"/>
+    
+    <!-- 프록시 인스턴스인 proxy 를 ProxyFactoryBean 클래스로 정의하고, 
+    	위빙 대상을 target 속성에 정의하고, interceptorNames 속성에는
+    	Target 에 적용되는 Advisor 를 지정한다 -->
+    <bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref local="targetBean"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>helloAdvisor</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Advisor 를 정의. Advice 와 Pointcut 을 묶어 Advisor 라고 한다. 여기서는 
+    	DefaultPointcutAdvisor 를 Advisor 로 사용한다 -->
+    <bean id="helloAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice">
+            <ref local="loggingAdvice"/>
+        </property>
+        
+        <property name="pointcut">
+            <bean class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+                <property name="pattern">
+                    <value>.*sayHello.*</value> <!-- 메소드 이름에 sayHello 가 포함되는 곳에 pointcut 을 지정했다 -->
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+</beans>
